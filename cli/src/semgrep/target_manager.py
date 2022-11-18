@@ -522,8 +522,7 @@ class TargetManager:
         """
         result = []
         for pattern in patterns:
-            result.append("**/" + pattern)
-            result.append("**/" + pattern + "/**")
+            result.append("**/" + pattern + "{/**,}")
         return result
 
     def executes_with_shebang(self, path: Path, shebangs: Collection[Shebang]) -> bool:
@@ -554,7 +553,7 @@ class TargetManager:
     @lru_cache(maxsize=10_000)  # size aims to be 100x of fully caching this repo
     def globfilter(self, candidates: Iterable[Path], pattern: str) -> List[Path]:
         result = wcglob.globfilter(
-            candidates, pattern, flags=wcglob.GLOBSTAR | wcglob.DOTGLOB
+            candidates, pattern, flags=wcglob.GLOBSTAR | wcglob.DOTGLOB | flags=wcglob.BRACE
         )
         return cast(List[Path], result)
 
@@ -610,9 +609,12 @@ class TargetManager:
             return FilteredFiles(candidates)
 
         kept = set()
+        new_candidates = candidates
         for pattern in TargetManager.preprocess_path_patterns(includes):
-            kept.update(self.globfilter(candidates, pattern))
-        return FilteredFiles(frozenset(kept), frozenset(candidates - kept))
+            delta = self.globfilter(new_candidates, pattern)
+            kept.update(delta)
+            new_candidates = frozenset(new_candidates - set(delta))
+        return FilteredFiles(frozenset(kept), new_candidates)
 
     def filter_excludes(
         self, excludes: Sequence[str], *, candidates: FrozenSet[Path]
@@ -626,10 +628,13 @@ class TargetManager:
             return FilteredFiles(candidates)
 
         removed = set()
+        new_candidates = candidates
         for pattern in TargetManager.preprocess_path_patterns(excludes):
-            removed.update(self.globfilter(candidates, pattern))
+            delta = self.globfilter(new_candidates, pattern)
+            removed.update(delta)
+            new_candidates = frozenset(new_candidates - set(delta))
 
-        return FilteredFiles(frozenset(candidates - removed), frozenset(removed))
+        return FilteredFiles(new_candidates, frozenset(removed))
 
     @staticmethod
     def filter_by_size(
