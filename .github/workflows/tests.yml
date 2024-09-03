@@ -217,7 +217,7 @@ jobs:
           cache: pipenv
       - run: pip install pipenv==2022.6.7
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ocaml-build-artifacts
       - name: Install artifacts
@@ -293,7 +293,7 @@ jobs:
           cache: pipenv
       - run: pip install pipenv==2022.6.7
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ocaml-build-artifacts
       - name: Install artifacts
@@ -334,7 +334,7 @@ jobs:
           cache: pipenv
       - run: pip install pipenv==2022.6.7
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ocaml-build-artifacts
       - name: Install artifacts
@@ -378,7 +378,7 @@ jobs:
           jq . cli/baseline_timing2.json
           pip3 uninstall -y semgrep
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ocaml-build-artifacts
       - name: Install artifacts
@@ -429,7 +429,7 @@ jobs:
     needs: [build-macos-release]
     steps:
       - name: download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: semgrep-osx
           path: test-artifacts
@@ -450,7 +450,7 @@ jobs:
       - name: Fetch semgrep-cli submodules
         run: git submodule update --init --recursive --recommend-shallow cli/src/semgrep/lang cli/src/semgrep/semgrep_interfaces
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ocaml-build-artifacts
       - name: Install artifacts
